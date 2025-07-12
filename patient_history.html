@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient History</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .patient-header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .patient-info {
+      margin-bottom: 20px;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      border-radius: 5px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .back-button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="patient-header" id="patientHeader">
+      <h2>Patient History</h2>
+    </div>
+
+    <div id="patientHistory">
+      <div><strong>Blood Pressure:</strong> <span id="bp">120/80</span></div>
+      <div><strong>Sugar Level:</strong> <span id="sugar">Normal</span></div>
+    </div>
+
+    <a href="add-notes.html?patientId=12345" class="back-button">Add Notes</a>
+    <a href="lab-test.html?patientId=12345" class="back-button">Add Lab Test</a>
+    <a href="dashboard-doctor2.html" class="back-button">Back to Dashboard</a>
+  </div>
+
+  <script>
+    // Function to generate random blood pressure value
+    function generateBloodPressure() {
+      const systolic = Math.floor(Math.random() * (140 - 90 + 1)) + 90;
+      const diastolic = Math.floor(Math.random() * (90 - 60 + 1)) + 60;
+      return `${systolic}/${diastolic}`;
+    }
+
+    // Function to generate random sugar level
+    function generateSugarLevel() {
+      const levels = ['Normal', 'Low', 'High'];
+      return levels[Math.floor(Math.random() * levels.length)];
+    }
+
+    // Function to generate random blood count
+    function generateBloodCount() {
+      return Math.floor(Math.random() * (5 - 4 + 1)) + 4.0;  // Random value between 4.0 and 5.0
+    }
+
+    // Function to generate random medicines
+    function generateMedicines() {
+      const medicines = ['Paracetamol', 'Ibuprofen', 'Aspirin', 'Amoxicillin', 'Metformin'];
+      return medicines[Math.floor(Math.random() * medicines.length)];
+    }
+
+    // Get the patientId from the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const patientId = urlParams.get('patientId');
+  
+    // Fetch patient details from localStorage
+    const patientDetails = JSON.parse(localStorage.getItem('patient_' + patientId));
+  
+    if (patientDetails) {
+      document.getElementById('patientHeader').innerHTML = `<h2>History for ${patientDetails.name}</h2>`;
+      document.getElementById('bp').textContent = generateBloodPressure();  // Generate random BP
+      document.getElementById('sugar').textContent = generateSugarLevel();  // Generate random Sugar Level
+  
+      // Generate random blood count and medicines
+      const bloodCount = generateBloodCount();
+      const medicines = generateMedicines();
+  
+      // Display the saved notes below the patient history details
+      const patientHistoryDiv = document.getElementById('patientHistory');
+      patientHistoryDiv.innerHTML += `
+        <div><strong>Medicines:</strong> ${medicines}</div>
+        <div><strong>Blood Count:</strong> ${bloodCount} x10^6 cells/μL</div>
+      `;
+    } else {
+      document.getElementById('patientHistory').innerHTML = '<div>No patient history found.</div>';
+    }
+  </script>
+
+</body>
+</html>
