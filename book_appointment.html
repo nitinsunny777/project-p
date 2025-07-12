@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .button-container button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 45%;
+        }
+
+        .existing-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .new-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .appointment-form, .success-message {
+            display: none;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .appointment-form input, .appointment-form select {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .appointment-form button, .back-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #138496;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Book Appointment</h1>
+        <div class="button-container">
+            <button class="existing-btn" onclick="showExistingForm()">Existing Patient</button>
+            <button class="new-btn" onclick="goToRegistration()">New Patient</button>
+        </div>
+
+        <div class="appointment-form" id="existingForm">
+            <h2>Existing Patient Details</h2>
+            <label for="searchField">Enter Patient ID, Contact or Name:</label>
+            <input type="text" id="searchField" required>
+            <button type="button" onclick="searchPatient()">Search</button>
+
+            <div id="patientDetails" style="display:none;">
+                <p><strong>Patient ID:</strong> <span id="patientId"></span></p>
+                <p><strong>Name:</strong> <span id="patientName"></span></p>
+                <p><strong>Gender:</strong> <span id="patientGender"></span></p>
+                <p><strong>Age:</strong> <span id="patientAge"></span></p>
+
+                <label for="doctor">Select Doctor:</label>
+                <select id="doctor" required>
+                    <option value="" disabled selected>Choose a Doctor</option>
+                </select>
+
+                <label for="date">Appointment Date:</label>
+                <input type="date" id="date" required>
+                <label for="time">Appointment Time:</label>
+                <input type="time" id="time" required>
+                <button type="button" onclick="bookAppointment()">Book Now</button>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <h2>Appointment Booked Successfully!</h2>
+        </div>
+
+        <button class="back-btn" onclick="goToDashboard()">Back to Dashboard</button>
+    </div>
+
+    <script>
+        function showExistingForm() {
+            document.getElementById('existingForm').style.display = 'block';
+            setMinDate(); // Set the minimum date
+            populateDoctors();
+        }
+
+        function goToRegistration() {
+            window.location.href = 'patient_registration.html';
+        }
+
+        function searchPatient() {
+            const searchValue = document.getElementById('searchField').value.trim();
+            const keys = Object.keys(localStorage);
+            let found = false;
+
+            keys.forEach((key) => {
+                if (key.startsWith('patient_')) {
+                    const patientData = JSON.parse(localStorage.getItem(key));
+                    if (
+                        patientData.contact === searchValue ||
+                        patientData.name.toLowerCase() === searchValue.toLowerCase() ||
+                        patientData.patientId === searchValue
+                    ) {
+                        document.getElementById('patientId').textContent = patientData.patientId;
+                        document.getElementById('patientName').textContent = patientData.name;
+                        document.getElementById('patientGender').textContent = patientData.gender;
+                        document.getElementById('patientAge').textContent = patientData.age;
+                        document.getElementById('patientDetails').style.display = 'block';
+                        found = true;
+                    }
+                }
+            });
+
+            if (!found) {
+                alert('No patient found. Redirecting to registration.');
+                goToRegistration();
+            }
+        }
+
+        function setMinDate() {
+            const dateInput = document.getElementById('date');
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const dd = String(today.getDate()).padStart(2, '0');
+            const minDate = `${yyyy}-${mm}-${dd}`;
+            dateInput.min = minDate;
+        }
+
+        function populateDoctors() {
+            const doctorSelect = document.getElementById('doctor');
+            doctorSelect.innerHTML = '<option value="" disabled selected>Choose a Doctor</option>'; // Reset options
+
+            const doctorData = JSON.parse(localStorage.getItem('doctorData')) || [];
+            doctorData.forEach((doctor) => {
+                const option = document.createElement('option');
+                option.value = doctor.doctorId;
+                option.textContent = `${doctor.doctorName} (${doctor.specialization}) - ₹${doctor.consultationFee}`;
+                doctorSelect.appendChild(option);
+            });
+
+            if (doctorData.length === 0) {
+                alert('No doctor data available. Please add doctors first.');
+            }
+        }
+
+        function bookAppointment() {
+            const contact = document.getElementById('searchField').value.trim();
+            const doctor = document.getElementById('doctor').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            if (doctor && date && time) {
+                const currentDateTime = new Date();
+                const appointmentDateTime = new Date(`${date}T${time}`);
+
+                if ((appointmentDateTime - currentDateTime) / (1000 * 60) < 10) {
+                    alert('The appointment time must be at least 10 minutes ahead of the current time.');
+                    return;
+                }
+
+                // Check if the doctor is already booked at this time
+                const doctorAppointments = JSON.parse(localStorage.getItem('appointments_' + doctor)) || [];
+                const isTimeTaken = doctorAppointments.some(appointment => appointment.date === date && appointment.time === time);
+
+                if (isTimeTaken) {
+                    alert('Doctor is already booked at this time. Please select another time.');
+                    return;
+                }
+
+                // Get the doctor details
+                const doctorData = JSON.parse(localStorage.getItem('doctorData')) || [];
+                const selectedDoctor = doctorData.find(d => d.doctorId === doctor);
+
+                if (!selectedDoctor) {
+                    alert('Selected doctor is not available.');
+                    return;
+                }
+
+                // Create the appointment
+                const appointment = {
+                    patientContact: contact,
+                    patientName: document.getElementById('patientName').textContent,
+                    doctorId: doctor,
+                    doctorName: selectedDoctor.doctorName,
+                    doctorSpecialization: selectedDoctor.specialization,
+                    doctorFee: selectedDoctor.consultationFee,
+                    date,
+                    time
+                };
+
+                // Save the appointment to localStorage
+                doctorAppointments.push(appointment);
+                localStorage.setItem('appointments_' + doctor, JSON.stringify(doctorAppointments));
+
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('existingForm').style.display = 'none';
+            } else {
+                alert('Please select a doctor, date, and time.');
+            }
+        }
+
+        function goToDashboard() {
+            window.location.href = 'receptionist dashboard.html';
+        }
+    </script>
+</body>
+</html>
