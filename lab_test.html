@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .input-area {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #ffffff;
+      color: #444;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    select:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+      outline: none;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      border-radius: 5px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .back-button:hover {
+      background-color: #45a049;
+    }
+
+    .test-display {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Add Lab Test</h1>
+
+    <div class="input-area">
+      <label for="labTest">Select Lab Test Prescribed:</label>
+      <select id="labTest">
+        <option value="" disabled selected>Select a lab test</option>
+        <option value="Blood Test">Blood Test</option>
+        <option value="MRI Test">MRI Test</option>
+        <option value="Cough Test">Cough Test</option>
+        <option value="Allergy Test">Allergy Test</option>
+        <option value="ECT Scan">ECT Scan</option>
+      </select>
+    </div>
+
+    <button class="back-button" onclick="saveLabTest()">ADD Lab Test</button>
+
+    <div class="test-display" id="testDisplay">
+      <!-- Display saved lab test results here -->
+    </div>
+
+    <a href="patient-history.html?patientId=12345" class="back-button">Back to Patient History</a>
+    <a href="dashboard-doctor2.html" class="back-button">Back to Dashboard</a>
+  </div>
+
+  <script>
+    function saveLabTest() {
+      const patientId = new URLSearchParams(window.location.search).get('patientId');
+      const labTestResults = document.getElementById('labTest').value;
+
+      if (labTestResults) {
+        const patientDetails = JSON.parse(localStorage.getItem('patient_' + patientId)) || {};
+
+        // Save or update lab test results in localStorage
+        patientDetails.labTests = labTestResults;
+        localStorage.setItem('patient_' + patientId, JSON.stringify(patientDetails));
+
+        document.getElementById('testDisplay').innerHTML = `<strong>Lab Test Added:</strong><p>${labTestResults}</p>`;
+        alert(`Lab test added successfully: ${labTestResults}`);
+      } else {
+        alert('Please select a lab test!');
+      }
+    }
+  </script>
+
+</body>
+</html>
