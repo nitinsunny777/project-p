@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .search-container button {
+            padding: 10px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .bill-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .appointment-item {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .back-btn {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #138496;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Appointment Bill</h1>
+        <div class="search-container">
+            <label for="searchField">Enter Patient ID or Name:</label>
+            <input type="text" id="searchField">
+            <button type="button" onclick="searchBill()">Search</button>
+        </div>
+
+        <div class="bill-details" id="billDetails" style="display:none;">
+            <div id="appointmentList"></div>
+            <div class="total" id="totalAmount">Total Amount: ₹0</div>
+        </div>
+
+        <button class="back-btn" onclick="goToDashboard()">Back</button>
+    </div>
+
+    <script>
+        function searchBill() {
+            const searchValue = document.getElementById('searchField').value.trim();
+            const keys = Object.keys(localStorage);
+            let found = false;
+            let totalAmount = 0;
+            const appointmentList = document.getElementById('appointmentList');
+            appointmentList.innerHTML = '';
+
+            keys.forEach((key) => {
+                if (key.startsWith('appointments_')) {
+                    const appointments = JSON.parse(localStorage.getItem(key)) || [];
+                    appointments.forEach((appointment) => {
+                        if (appointment.patientContact === searchValue || 
+                            appointment.patientName.toLowerCase() === searchValue.toLowerCase()) {
+                            found = true;
+                            totalAmount += parseFloat(appointment.doctorFee);
+                            appointmentList.innerHTML += `
+                                <div class="appointment-item">
+                                    <p><strong>Patient ID:</strong> ${appointment.patientContact}</p>
+                                    <p><strong>Patient Name:</strong> ${appointment.patientName}</p>
+                                    <p><strong>Doctor:</strong> ${appointment.doctorName}</p>
+                                    <p><strong>Specialization:</strong> ${appointment.doctorSpecialization}</p>
+                                    <p><strong>Fee:</strong> ₹${appointment.doctorFee}</p>
+                                    <p><strong>Date:</strong> ${appointment.date}</p>
+                                    <p><strong>Time:</strong> ${appointment.time}</p>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            });
+
+            if (found) {
+                document.getElementById('billDetails').style.display = 'block';
+                document.getElementById('totalAmount').textContent = `Total Amount: ₹${totalAmount}`;
+            } else {
+                alert('No appointment found for this patient.');
+            }
+        }
+
+
+
+    
+        function goToDashboard() {
+            window.location.href = 'receptionist dashboard.html';
+        }
+    </script>
+</body>
+</html>
