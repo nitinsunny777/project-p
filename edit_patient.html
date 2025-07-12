@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Patient Details</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2em;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    .button-container {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      flex: 1;
+      margin: 0 10px;
+    }
+
+    .save-btn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .cancel-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Edit Patient Details</h1>
+    <form id="editPatientForm">
+      <div class="form-group">
+        <label for="patientId">Patient ID:</label>
+        <input type="text" id="patientId" required>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="contact">Contact:</label>
+        <input type="text" id="contact" required>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Age:</label>
+        <input type="number" id="age" required>
+      </div>
+
+      <div class="form-group">
+        <label for="gender">Gender:</label>
+        <select id="gender" required>
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address:</label>
+        <input type="text" id="address" required>
+      </div>
+
+      <div class="button-container">
+        <button type="submit" class="save-btn">Save</button>
+        <button type="button" class="cancel-btn" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const patientId = new URLSearchParams(window.location.search).get('id');
+    const patientData = JSON.parse(localStorage.getItem('patient_' + patientId));
+
+    if (patientData) {
+      document.getElementById('patientId').value = patientData.patientId;
+      document.getElementById('name').value = patientData.name;
+      document.getElementById('contact').value = patientData.contact;
+      document.getElementById('age').value = patientData.age;
+      document.getElementById('gender').value = patientData.gender;
+      document.getElementById('address').value = patientData.address;
+    } else {
+      alert('Patient not found.');
+      window.location.href = 'view_patients.html';
+    }
+
+    document.getElementById('editPatientForm').onsubmit = function(event) {
+      event.preventDefault();
+
+      const updatedId = document.getElementById('patientId').value;
+      const name = document.getElementById('name').value;
+      const contact = document.getElementById('contact').value;
+      const age = document.getElementById('age').value;
+      const gender = document.getElementById('gender').value;
+      const address = document.getElementById('address').value;
+
+      // Validate patient ID uniqueness
+      if (updatedId !== patientId && localStorage.getItem('patient_' + updatedId)) {
+        alert('ID is already present. Please choose a unique ID.');
+        return;
+      }
+
+      // Validate name
+      const nameRegex = /^[A-Za-z ]{1,30}$/;
+      if (!nameRegex.test(name)) {
+        alert('Invalid name format. Please enter alphabets and spaces only, up to 30 characters.');
+        return;
+      }
+
+      // Validate contact
+      const contactRegex = /^\d{10}$/;
+      if (!contactRegex.test(contact)) {
+        alert('Invalid contact number. Please enter a 10-digit number.');
+        return;
+      }
+
+      // Validate address
+      const addressRegex = /^[A-Za-z ]{1,50}$/;
+      if (!addressRegex.test(address)) {
+        alert('Invalid address format. Please enter alphabets and spaces only, up to 50 characters.');
+        return;
+      }
+
+      // Save updated data
+      const updatedData = {
+        patientId: updatedId,
+        name,
+        contact,
+        age,
+        gender,
+        address,
+      };
+
+      // Remove old entry if ID changed
+      if (updatedId !== patientId) {
+        localStorage.removeItem('patient_' + patientId);
+      }
+
+      localStorage.setItem('patient_' + updatedId, JSON.stringify(updatedData));
+      alert('Patient details updated successfully!');
+      window.location.href = 'view_patients.html';
+    };
+
+    function cancelEdit() {
+      window.location.href = 'view_patients.html';
+    }
+  </script>
+</body>
+</html>
