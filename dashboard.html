@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Staff & Doctor Management</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Slideshow container */
+    .slideshow-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .slides {
+      display: none;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .container {
+      position: relative;
+      width: 90%;
+      margin: 30px auto;
+      background-color: rgba(255, 255, 255, 0.9); 
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-icon {
+      font-size: 50px;
+      margin: 20px 0;
+      color: #28a745;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #333;
+    }
+
+    .card-description {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .card button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    .card button:hover {
+      background-color: #218838;
+    }
+
+    .logout-button {
+      background-color: #dc3545;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .logout-button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background Image Slideshow -->
+  <div class="slideshow-container">
+    <img class="slides" src="watermark removed.png" alt="Background Image 1">
+  </div>
+
+  <div class="container">
+    <img src="logo.jpg" alt="Raksha Hospital Logo" class="logo">
+    <h1>Raksha Clinic - Admin Dashboard</h1>
+
+    <div class="card-container">
+      <!-- Staff Management Card -->
+      <div class="card">
+        <div class="card-icon">👩‍💼</div>
+        <div class="card-content">
+          <div class="card-title">Staff Management</div>
+          <div class="card-description">Manage staff details .</div>
+          <button onclick="navigateTo('staff.html')">Manage Staff</button>
+        </div>
+      </div>
+
+      <!-- Doctor Management Card -->
+      <div class="card">
+        <div class="card-icon">👨‍⚕️</div>
+        <div class="card-content">
+          <div class="card-title">Doctor Management</div>
+          <div class="card-description">Manage doctor profiles, schedules, and more.</div>
+          <button onclick="navigateTo('doctor.html')">Manage Doctors</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="logout-button" onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    let slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+      let slides = document.getElementsByClassName("slides");
+      for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+      }
+      slideIndex++;
+      if (slideIndex > slides.length) { slideIndex = 1; }
+      slides[slideIndex - 1].style.display = "block";
+      setTimeout(showSlides, 4000); // Change image every 4 seconds
+    }
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
