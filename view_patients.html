@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Patients</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    .back-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    .back-btn:hover {
+      background-color: #0056b3;
+    }
+    .edit-btn, .delete-btn {
+      padding: 5px 10px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .edit-btn:hover {
+      background-color: #218838;
+    }
+    .delete-btn {
+      background-color: #dc3545;
+    }
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Registered Patients</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Patient ID</th>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="patientTable">
+        <!-- Patient rows will be dynamically populated -->
+      </tbody>
+    </table>
+    <a href="receptionist dashboard.html" class="back-btn">Back to Dashboard</a>
+  </div>
+
+  <script>
+    function loadPatients() {
+      const tableBody = document.getElementById('patientTable');
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('patient_')) {
+          const patient = JSON.parse(localStorage.getItem(key));
+
+          if (patient && patient.patientId !== undefined) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${patient.patientId}</td>
+              <td>${patient.name}</td>
+              <td>${patient.contact}</td>
+              <td>${patient.age}</td>
+              <td>${patient.gender}</td>
+              <td>${patient.address}</td>
+              <td>
+                <button class="edit-btn" onclick="editPatient('${patient.patientId}')">Edit</button>
+                <button class="delete-btn" onclick="deletePatient('${patient.patientId}')">Delete</button>
+              </td>
+            `;
+            tableBody.appendChild(row);
+          }
+        }
+      }
+    }
+
+    function editPatient(patientId) {
+      const patient = localStorage.getItem('patient_' + patientId);
+      if (patient) {
+        window.location.href = `edit_patient.html?id=${patientId}`;
+      } else {
+        alert('Patient not found.');
+      }
+    }
+
+    function deletePatient(patientId) {
+      if (patientId === undefined || patientId === null) {
+        alert('Invalid Patient ID');
+        return;
+      }
+
+      const confirmation = confirm('Are you sure you want to delete this patient?');
+      if (confirmation) {
+        const patientKey = 'patient_' + patientId;
+
+        if (localStorage.getItem(patientKey)) {
+          localStorage.removeItem(patientKey);
+          loadPatients(); // Reload the patients list after deletion
+        } else {
+          alert('Patient not found.');
+        }
+      }
+    }
+
+    window.onload = loadPatients;
+  </script>
+</body>
+</html>
