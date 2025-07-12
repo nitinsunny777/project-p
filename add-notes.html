@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Notes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .input-area {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fdfdfd;
+      color: #444;
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23444" width="24px" height="24px"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 20px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    select:hover {
+      background-color: #f0f0f0;
+    }
+
+    select:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+      outline: none;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      border-radius: 5px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .back-button:hover {
+      background-color: #45a049;
+    }
+
+    .notes-display {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Add Notes</h1>
+
+    <div class="input-area">
+      <label for="medicines">Enter Doctor's Advice (Progress):</label>
+      <select id="medicines">
+        <option value="" disabled selected>Select an option</option>
+        <option value="Improved">Improved</option>
+        <option value="Needs more improvement">Needs more improvement</option>
+      </select>
+      <div class="error-message" id="error-message"></div>
+    </div>
+
+    <button class="back-button" onclick="saveNotes()">ADD Notes</button>
+
+    <a href="patient-history.html?patientId=12345" class="back-button">Back to Patient History</a>
+    <a href="dashboard-doctor2.html" class="back-button">Back to Dashboard</a>
+
+    <div class="notes-display" id="notes-display"></div>
+  </div>
+
+  <script>
+    // Function to save the notes and display them below the dropdown
+    function saveNotes() {
+      const patientId = new URLSearchParams(window.location.search).get('patientId');
+      const notes = document.getElementById('medicines').value;
+      const errorMessage = document.getElementById('error-message');
+      const notesDisplay = document.getElementById('notes-display');
+
+      // Clear previous messages
+      errorMessage.textContent = '';
+      notesDisplay.textContent = '';
+
+      if (notes) {
+        const patientDetails = JSON.parse(localStorage.getItem('patient_' + patientId)) || {};
+
+        // Save or update notes in localStorage
+        patientDetails.notes = notes;
+        localStorage.setItem('patient_' + patientId, JSON.stringify(patientDetails));
+
+        // Display the selected note below the dropdown
+        notesDisplay.textContent = `Doctor's Progress Report for Patient: ${notes}`;
+      } else {
+        // Show error if no option is selected
+        errorMessage.textContent = 'Please select an option!';
+      }
+    }
+  </script>
+
+</body>
+</html>
