@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Login</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Full-screen background video */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .center-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      margin: 15px 0;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .login-btn {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .login-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .back-btn {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .back-btn:hover {
+      background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Video -->
+  <video class="video-background" autoplay muted loop>
+    <source src="watermark hospitalvideo.mp4.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="center-wrapper">
+    <div class="container">
+      <!-- Logo Section -->
+      <img src="logo.jpg" alt="Raksha Hospital Logo" class="logo">
+      <h1>Confirm Doctor Login ID</h1>
+      <input type="text" id="doctorId" placeholder="Enter UNIQUE Doctor ID">
+      <input type="password" id="doctorPassword" placeholder="Enter Password">
+      <button class="login-btn" onclick="login()">Login</button>
+      <button class="back-btn" onclick="goBack()">LOGOUT</button>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const doctorId = document.getElementById('doctorId').value.trim();
+      const enteredPassword = document.getElementById('doctorPassword').value.trim();
+      if (!doctorId || !enteredPassword) {
+        alert('Please enter both Doctor ID and Password.');
+        return;
+      }
+
+      const storedDoctors = JSON.parse(localStorage.getItem('doctorData')) || [];
+      
+      // Generate expected password based on Doctor ID
+      const expectedPassword = generatePassword(doctorId);
+
+      // Check if entered password matches the generated password
+      if (enteredPassword === expectedPassword) {
+        const doctorExists = storedDoctors.some(doc => doc.doctorId === doctorId);
+
+        if (doctorExists) {
+          alert('Login successful!');
+          localStorage.setItem('loggedInDoctorId', doctorId);
+          window.location.href = 'dashboard-doctor2.html';
+        } else {
+          alert('Doctor ID does not exist.');
+        }
+      } else {
+        alert('Invalid password.');
+      }
+    }
+
+    function generatePassword(doctorId) {
+      // Ensure the Doctor ID is a valid number
+      const idNum = parseInt(doctorId, 10);
+      if (isNaN(idNum) || idNum <= 0) {
+        return ''; // Invalid Doctor ID
+      }
+      return String(idNum).padStart(4, '0'); // Generates password like 0001, 0002, etc.
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
