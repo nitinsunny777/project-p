@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upcoming Schedules</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      flex-grow: 1;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .no-sessions {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      color: #888;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .back-button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upcoming Schedules</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Patient ID</th>
+          <th>Patient Name</th>
+          <th>Appointment Date</th>
+          <th>Appointment Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="schedulesList"></tbody>
+    </table>
+
+    <p id="noSessionsMessage" class="no-sessions" style="display: none;">No upcoming sessions</p>
+
+    <a href="dashboard-doctor2.html" class="back-button">Back to Dashboard</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Get the doctorId from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const doctorId = urlParams.get('doctorId');
+
+      if (doctorId) {
+        displayUpcomingSchedules(doctorId);
+      } else {
+        alert('Please log in first.');
+        window.location.href = 'login.html'; // Redirect to login if doctorId is not present
+      }
+    });
+
+    function displayUpcomingSchedules(doctorId) {
+      const appointments = JSON.parse(localStorage.getItem('appointments_' + doctorId)) || [];
+      const schedulesListElement = document.getElementById('schedulesList');
+      const noSessionsMessageElement = document.getElementById('noSessionsMessage');
+
+      schedulesListElement.innerHTML = '';
+
+      const currentDate = new Date();
+
+      // Filter upcoming appointments and exclude those for deleted patients
+      const futureAppointments = appointments.filter(appointment => {
+        const appointmentDate = new Date(`${appointment.date}T${appointment.time}:00`);
+        const patientDetails = JSON.parse(localStorage.getItem('patient_' + appointment.patientContact));
+        return appointmentDate > currentDate && patientDetails !== null;
+      });
+
+      if (futureAppointments.length === 0) {
+        noSessionsMessageElement.style.display = 'block';
+      } else {
+        noSessionsMessageElement.style.display = 'none';
+
+        futureAppointments.forEach(appointment => {
+          const patientDetails = JSON.parse(localStorage.getItem('patient_' + appointment.patientContact));
+          const row = document.createElement('tr');
+
+          row.innerHTML = `
+            <td>${appointment.patientContact}</td>
+            <td>${patientDetails?.name || 'Unknown'}</td>
+            <td>${appointment.date}</td>
+            <td>${appointment.time}</td>
+            <td>✔</td>
+          `;
+
+          schedulesListElement.appendChild(row);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
