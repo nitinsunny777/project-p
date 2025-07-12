@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments Today</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .container {
+      width: 80%;
+      margin: 40px auto;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      flex-grow: 1;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px 20px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    td {
+      background-color: #fafafa;
+    }
+
+    td:last-child {
+      text-align: center;
+    }
+
+    .no-appointments {
+      text-align: center;
+      font-size: 18px;
+      color: #888;
+      padding: 20px;
+    }
+
+    .status-checked {
+      color: green;
+      font-weight: bold;
+    }
+
+    .alert {
+      text-align: center;
+      color: red;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    .back-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 20px auto;
+      display: block;
+      text-align: center;
+    }
+
+    .back-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Appointments Today</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Patient ID</th>
+          <th>Patient Name</th>
+          <th>Patient Contact</th>
+          <th>Patient Gender</th>
+          <th>Appointment Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="appointmentsTodayList"></tbody>
+    </table>
+    <div id="alertMessage" class="alert"></div>
+  </div>
+
+  <!-- Back to Dashboard Button -->
+  <button class="back-btn" onclick="window.location.href='dashboard-doctor2.html';">Back to Dashboard</button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Retrieve the doctor ID from the URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const doctorId = urlParams.get('doctorId');
+
+      if (doctorId) {
+        displayAppointmentsToday(doctorId);
+      } else {
+        alert('Please log in first.');
+        window.location.href = 'login.html';
+      }
+    });
+
+    function displayAppointmentsToday(doctorId) {
+      const appointments = JSON.parse(localStorage.getItem('appointments_' + doctorId)) || [];
+      const today = new Date().toISOString().split('T')[0];
+      const appointmentsListElement = document.getElementById('appointmentsTodayList');
+      const alertMessage = document.getElementById('alertMessage');
+      
+      appointmentsListElement.innerHTML = '';
+      alertMessage.innerHTML = '';
+
+      let foundAppointment = false;
+
+      appointments.forEach(appointment => {
+        if (appointment.date.trim() === today) {
+          const patientDetails = JSON.parse(localStorage.getItem('patient_' + appointment.patientContact));
+
+          if (patientDetails) {
+            foundAppointment = true;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${appointment.patientContact}</td>
+              <td>${patientDetails.name || 'Unknown'}</td>
+              <td>${patientDetails.contact || 'N/A'}</td>
+              <td>${patientDetails.gender || 'N/A'}</td>
+              <td>${appointment.time}</td>
+              <td class="status-checked">✔</td>
+            `;
+            appointmentsListElement.appendChild(row);
+          }
+        }
+      });
+
+      if (!foundAppointment) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="6" class="no-appointments">No appointments today</td>`;
+        appointmentsListElement.appendChild(row);
+        alertMessage.innerHTML = 'No appointments scheduled for today.';
+      }
+    }
+  </script>
+</body>
+</html>
